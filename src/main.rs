@@ -1,7 +1,6 @@
 mod days;
 
 fn main() {
-    println!("Hello, world!");
     let day1a = days::day1::part1();
     println!("Day1: a: {:?}", day1a.unwrap());
 
