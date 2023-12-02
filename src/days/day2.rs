@@ -1,16 +1,9 @@
-use anyhow::Result;
+use crate::utils::{self, Solution};
 use std::fs;
 
-// Allowed cubes:
-// Red: 12
-// Green: 13
-// Blue: 14
-
-// Example line:
-// Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-const ALLOWED_RED: u32 = 12;
-const ALLOWED_GREEN: u32 = 13;
-const ALLOWED_BLUE: u32 = 14;
+const ALLOWED_NUM_RED: u32 = 12;
+const ALLOWED_NUM_GREEN: u32 = 13;
+const ALLOWED_NUM_BLUE: u32 = 14;
 
 #[derive(Debug, PartialEq)]
 struct BagGame {
@@ -18,99 +11,113 @@ struct BagGame {
     sets: Vec<Vec<(String, u32)>>,
 }
 
-pub fn part1() -> Result<String> {
-    let lines: Vec<String> = fs::read_to_string("./inputs/day2.txt")
-        .expect("Could not read file 'day2'")
-        .split("\n")
-        .filter(|s| !s.is_empty())
-        .map(|s| s.to_string())
-        .collect();
+#[derive(Default)]
+pub struct Day2 {
+    lines: Vec<String>,
+}
 
-    let games = format_input_to_games(lines);
+impl Day2 {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 
-    let mut total = 0;
+impl Solution for Day2 {
+    fn name(&self) -> (usize, usize) {
+        (2023, 2)
+    }
 
-    for game in games {
-        let mut allowed = true;
+    fn parse_input(&mut self) {
+        self.lines = utils::read_lines("./inputs/day2.txt");
+    }
 
-        for set in game.sets {
-            for (color, count) in set {
-                match color.as_str() {
-                    "red" => {
-                        if count > ALLOWED_RED {
-                            allowed = false;
+    fn part1(&mut self) -> Vec<String> {
+        let games = format_input_to_games(&self.lines);
+
+        let mut total = 0;
+
+        for game in games {
+            let mut allowed = true;
+
+            for set in game.sets {
+                for (color, count) in set {
+                    match color.as_str() {
+                        "red" => {
+                            if count > ALLOWED_NUM_RED {
+                                allowed = false;
+                            }
                         }
-                    }
-                    "green" => {
-                        if count > ALLOWED_GREEN {
-                            allowed = false;
+                        "green" => {
+                            if count > ALLOWED_NUM_GREEN {
+                                allowed = false;
+                            }
                         }
-                    }
-                    "blue" => {
-                        if count > ALLOWED_BLUE {
-                            allowed = false;
+                        "blue" => {
+                            if count > ALLOWED_NUM_BLUE {
+                                allowed = false;
+                            }
                         }
+                        _ => println!("Unknown color: {}", color),
                     }
-                    _ => println!("Unknown color: {}", color),
                 }
+            }
+
+            if allowed {
+                total += game.id;
             }
         }
 
-        if allowed {
-            total += game.id;
-        }
+        vec![total.to_string()]
     }
 
-    Ok(total.to_string())
-}
+    fn part2(&mut self) -> Vec<String> {
+        let lines: Vec<String> = fs::read_to_string("./inputs/day2.txt")
+            .expect("Could not read file 'day2'")
+            .split("\n")
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
 
-pub fn part2() -> Result<String> {
-    let lines: Vec<String> = fs::read_to_string("./inputs/day2.txt")
-        .expect("Could not read file 'day2'")
-        .split("\n")
-        .filter(|s| !s.is_empty())
-        .map(|s| s.to_string())
-        .collect();
+        let games = format_input_to_games(&lines);
 
-    let games = format_input_to_games(lines);
+        let mut total = 0;
 
-    let mut total = 0;
-
-    for game in games {
-        let mut fewest_reds = 0;
-        let mut fewest_greens = 0;
-        let mut fewest_blues = 0;
-        for set in game.sets {
-            for (color, count) in set {
-                match color.as_str() {
-                    "red" => {
-                        if count > fewest_reds {
-                            fewest_reds = count;
+        for game in games {
+            let mut fewest_reds = 0;
+            let mut fewest_greens = 0;
+            let mut fewest_blues = 0;
+            for set in game.sets {
+                for (color, count) in set {
+                    match color.as_str() {
+                        "red" => {
+                            if count > fewest_reds {
+                                fewest_reds = count;
+                            }
                         }
-                    }
-                    "green" => {
-                        if count > fewest_greens {
-                            fewest_greens = count;
+                        "green" => {
+                            if count > fewest_greens {
+                                fewest_greens = count;
+                            }
                         }
-                    }
-                    "blue" => {
-                        if count > fewest_blues {
-                            fewest_blues = count;
+                        "blue" => {
+                            if count > fewest_blues {
+                                fewest_blues = count;
+                            }
                         }
+                        _ => println!("Unknown color: {}", color),
                     }
-                    _ => println!("Unknown color: {}", color),
                 }
             }
+
+            let power = fewest_reds * fewest_greens * fewest_blues;
+            total += power;
         }
 
-        let power = fewest_reds * fewest_greens * fewest_blues;
-        total += power;
+        vec![total.to_string()]
     }
-
-    Ok(total.to_string())
 }
 
-fn format_input_to_games(input: Vec<String>) -> Vec<BagGame> {
+fn format_input_to_games(input: &Vec<String>) -> Vec<BagGame> {
     let mut games: Vec<BagGame> = Vec::new();
 
     for line in input {
@@ -152,13 +159,13 @@ mod tests {
 
     #[test]
     fn it_parses_the_input_to_baggames() {
-        let input: Vec<String> = [
+        let input: Vec<String> = vec![
         "Game 1: 9 red, 2 green, 13 blue; 10 blue, 2 green, 13 red; 8 blue, 3 red, 6 green; 5 green, 2 red, 1 blue".to_string(),
         "Game 2: 2 green, 2 blue, 16 red; 14 red; 13 red, 13 green, 2 blue; 7 red, 7 green, 2 blue".to_string(),
         "Game 3: 6 red, 4 green, 7 blue; 7 blue, 9 red, 3 green; 2 red, 4 green; 6 red, 2 blue; 7 blue, 9 red, 5 green".to_string(),
-        ].to_vec();
+        ];
 
-        let games = format_input_to_games(input);
+        let games = format_input_to_games(&input);
 
         let expected = [
             BagGame {
