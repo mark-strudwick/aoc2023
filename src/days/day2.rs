@@ -20,7 +20,7 @@ struct BagGame {
 
 pub fn part1() -> Result<String> {
     let lines: Vec<String> = fs::read_to_string("./inputs/day2.txt")
-        .expect("Could not read file 'day1'")
+        .expect("Could not read file 'day2'")
         .split("\n")
         .filter(|s| !s.is_empty())
         .map(|s| s.to_string())
@@ -59,6 +59,52 @@ pub fn part1() -> Result<String> {
         if allowed {
             total += game.id;
         }
+    }
+
+    Ok(total.to_string())
+}
+
+pub fn part2() -> Result<String> {
+    let lines: Vec<String> = fs::read_to_string("./inputs/day2.txt")
+        .expect("Could not read file 'day2'")
+        .split("\n")
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .collect();
+
+    let games = format_input_to_games(lines);
+
+    let mut total = 0;
+
+    for game in games {
+        let mut fewest_reds = 0;
+        let mut fewest_greens = 0;
+        let mut fewest_blues = 0;
+        for set in game.sets {
+            for (color, count) in set {
+                match color.as_str() {
+                    "red" => {
+                        if count > fewest_reds {
+                            fewest_reds = count;
+                        }
+                    }
+                    "green" => {
+                        if count > fewest_greens {
+                            fewest_greens = count;
+                        }
+                    }
+                    "blue" => {
+                        if count > fewest_blues {
+                            fewest_blues = count;
+                        }
+                    }
+                    _ => println!("Unknown color: {}", color),
+                }
+            }
+        }
+
+        let power = fewest_reds * fewest_greens * fewest_blues;
+        total += power;
     }
 
     Ok(total.to_string())

@@ -9,4 +9,7 @@ fn main() {
 
     let day2a = days::day2::part1();
     println!("Day2: a: {:?}", day2a.unwrap());
+
+    let day2b = days::day2::part2();
+    println!("Day2: b: {:?}", day2b.unwrap());
 }
