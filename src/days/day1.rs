@@ -62,13 +62,11 @@ impl Solution for Day1 {
                 .map(|c| c.to_digit(10).unwrap())
                 .collect();
 
-            let first_num = numeric_chars.iter().nth(0);
-            let last_num = numeric_chars.iter().last();
+            let first_num = numeric_chars.iter().nth(0).unwrap();
+            let last_num = numeric_chars.iter().last().unwrap();
 
-            if let (Some(first), Some(last)) = (first_num, last_num) {
-                let result = format!("{:?}{:?}", first, last);
-                total += result.parse::<u32>().unwrap();
-            }
+            let result = first_num * 10 + last_num;
+            total += result;
         }
 
         vec![total.to_string()]
