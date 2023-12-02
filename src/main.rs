@@ -1,11 +1,18 @@
 mod days;
+mod utils;
+
+use days::day1::Day1;
+
+use crate::utils::Solution;
 
 fn main() {
-    let day1a = days::day1::part1();
-    println!("Day1: a: {:?}", day1a.unwrap());
+    let mut day01 = Day1::new();
 
-    let day1b = days::day1::part2();
-    println!("Day1: b: {:?}", day1b.unwrap());
+    let days: Vec<&mut dyn Solution> = vec![&mut day01];
+
+    for d in days {
+        utils::run_solution(d);
+    }
 
     let day2a = days::day2::part1();
     println!("Day2: a: {:?}", day2a.unwrap());
