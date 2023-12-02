@@ -30,13 +30,13 @@ pub fn part1() -> Result<String> {
 }
 
 pub fn part2() -> Result<String> {
-    let mut file_lines: Vec<String> = fs::read_to_string("./inputs/day1.txt")
+    let mut lines: Vec<String> = fs::read_to_string("./inputs/day1.txt")
         .expect("Could not read file 'day1'")
         .split("\n")
         .map(|s| s.to_string())
         .collect();
 
-    for l in file_lines.iter_mut() {
+    for l in lines.iter_mut() {
         *l = str::replace(l, "one", "o1e");
         *l = str::replace(l, "two", "t2o");
         *l = str::replace(l, "three", "th3ee");
@@ -49,21 +49,21 @@ pub fn part2() -> Result<String> {
     }
 
     let mut total = 0;
-    for l in file_lines.iter() {
-        let mut first_num = 0;
-        let mut last_num = 0;
-        for c in l.chars() {
-            if c.is_digit(10) && first_num == 0 {
-                first_num = c.to_digit(10).unwrap();
-            }
+
+    for line in lines {
+        let numeric_chars: Vec<u32> = line
+            .chars()
+            .filter(|c| c.is_ascii_digit())
+            .map(|c| c.to_digit(10).unwrap())
+            .collect();
+
+        let first_num = numeric_chars.iter().nth(0);
+        let last_num = numeric_chars.iter().last();
+
+        if let (Some(first), Some(last)) = (first_num, last_num) {
+            let result = format!("{:?}{:?}", first, last);
+            total += result.parse::<u32>().unwrap();
         }
-        for c in l.chars().rev() {
-            if c.is_digit(10) && last_num == 0 {
-                last_num = c.to_digit(10).unwrap();
-            }
-        }
-        let result = format!("{}{}", first_num.to_string(), last_num.to_string());
-        total += result.parse::<i32>().unwrap();
     }
 
     Ok(total.to_string())
