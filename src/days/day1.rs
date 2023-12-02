@@ -5,6 +5,7 @@ pub fn part1() -> Result<String> {
     let lines: Vec<String> = fs::read_to_string("./inputs/day1.txt")
         .expect("Could not read file 'day1'")
         .split("\n")
+        .filter(|s| !s.is_empty())
         .map(|s| s.to_string())
         .collect();
 
@@ -33,6 +34,7 @@ pub fn part2() -> Result<String> {
     let mut lines: Vec<String> = fs::read_to_string("./inputs/day1.txt")
         .expect("Could not read file 'day1'")
         .split("\n")
+        .filter(|s| !s.is_empty())
         .map(|s| s.to_string())
         .collect();
 
