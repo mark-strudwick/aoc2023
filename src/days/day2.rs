@@ -1,5 +1,4 @@
 use crate::utils::{self, Solution};
-use std::fs;
 
 const ALLOWED_NUM_RED: u32 = 12;
 const ALLOWED_NUM_GREEN: u32 = 13;
@@ -71,14 +70,7 @@ impl Solution for Day2 {
     }
 
     fn part2(&mut self) -> Vec<String> {
-        let lines: Vec<String> = fs::read_to_string("./inputs/day2.txt")
-            .expect("Could not read file 'day2'")
-            .split("\n")
-            .filter(|s| !s.is_empty())
-            .map(|s| s.to_string())
-            .collect();
-
-        let games = format_input_to_games(&lines);
+        let games = format_input_to_games(&self.lines);
 
         let mut total = 0;
 
