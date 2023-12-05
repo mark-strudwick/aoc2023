@@ -126,7 +126,8 @@ impl Solution for Day5 {
                 seed_to_soil_mapped.mappings.insert(source, dest);
             });
         });
-        for i in 0..100 {
+        // loop through 0 to the max key in the hashmap and add any missing keys
+        for i in 0..=*seed_to_soil_mapped.mappings.keys().max().unwrap() {
             if !seed_to_soil_mapped.mappings.contains_key(&i) {
                 seed_to_soil_mapped.mappings.insert(i, i);
             }
@@ -158,7 +159,7 @@ impl Solution for Day5 {
                 soil_to_fertilizer_mapped.mappings.insert(source, dest);
             });
         });
-        for i in 0..100 {
+        for i in 0..=*soil_to_fertilizer_mapped.mappings.keys().max().unwrap() {
             if !soil_to_fertilizer_mapped.mappings.contains_key(&i) {
                 soil_to_fertilizer_mapped.mappings.insert(i, i);
             }
@@ -190,7 +191,7 @@ impl Solution for Day5 {
                 fertilizer_to_water_mapped.mappings.insert(source, dest);
             });
         });
-        for i in 0..100 {
+        for i in 0..=*fertilizer_to_water_mapped.mappings.keys().max().unwrap() {
             if !fertilizer_to_water_mapped.mappings.contains_key(&i) {
                 fertilizer_to_water_mapped.mappings.insert(i, i);
             }
@@ -222,7 +223,7 @@ impl Solution for Day5 {
                 water_to_light_mapped.mappings.insert(source, dest);
             });
         });
-        for i in 0..100 {
+        for i in 0..=*water_to_light_mapped.mappings.keys().max().unwrap() {
             if !water_to_light_mapped.mappings.contains_key(&i) {
                 water_to_light_mapped.mappings.insert(i, i);
             }
@@ -255,7 +256,7 @@ impl Solution for Day5 {
                 light_to_temperature_mapped.mappings.insert(source, dest);
             });
         });
-        for i in 0..100 {
+        for i in 0..=*light_to_temperature_mapped.mappings.keys().max().unwrap() {
             if !light_to_temperature_mapped.mappings.contains_key(&i) {
                 light_to_temperature_mapped.mappings.insert(i, i);
             }
@@ -288,7 +289,12 @@ impl Solution for Day5 {
                 temperature_to_humidity_mapped.mappings.insert(source, dest);
             });
         });
-        for i in 0..100 {
+        for i in 0..=*temperature_to_humidity_mapped
+            .mappings
+            .keys()
+            .max()
+            .unwrap()
+        {
             if !temperature_to_humidity_mapped.mappings.contains_key(&i) {
                 temperature_to_humidity_mapped.mappings.insert(i, i);
             }
@@ -319,13 +325,12 @@ impl Solution for Day5 {
             dest_range.zip(source_range).for_each(|(dest, source)| {
                 humidity_to_location_mapped.mappings.insert(source, dest);
             });
-
-            for i in 0..100 {
-                if !humidity_to_location_mapped.mappings.contains_key(&i) {
-                    humidity_to_location_mapped.mappings.insert(i, i);
-                }
-            }
         });
+        for i in 0..=*humidity_to_location_mapped.mappings.keys().max().unwrap() {
+            if !humidity_to_location_mapped.mappings.contains_key(&i) {
+                humidity_to_location_mapped.mappings.insert(i, i);
+            }
+        }
 
         self.seed_to_soil_mapping = seed_to_soil_mapped;
         self.soil_to_fertilizer_mapping = soil_to_fertilizer_mapped;
@@ -340,29 +345,50 @@ impl Solution for Day5 {
         let mut lowest_location = 4294967295;
 
         for seed in &self.seeds {
-            let soil = self.seed_to_soil_mapping.mappings.get(seed).unwrap();
-            let fertilizer = self.soil_to_fertilizer_mapping.mappings.get(soil).unwrap();
-            let water = self
-                .fertilizer_to_water_mapping
-                .mappings
-                .get(fertilizer)
-                .unwrap();
-            let light = self.water_to_light_mapping.mappings.get(water).unwrap();
-            let temperature = self
-                .light_to_temperature_mapping
-                .mappings
-                .get(light)
-                .unwrap();
+            let soil = self.seed_to_soil_mapping.mappings.get(seed);
+            if soil.is_none() {
+                continue;
+            }
+            let soil = soil.unwrap();
+
+            let fertilizer = self.soil_to_fertilizer_mapping.mappings.get(soil);
+            if fertilizer.is_none() {
+                continue;
+            }
+            let fertilizer = fertilizer.unwrap();
+
+            let water = self.fertilizer_to_water_mapping.mappings.get(fertilizer);
+            if water.is_none() {
+                continue;
+            }
+            let water = water.unwrap();
+
+            let light = self.water_to_light_mapping.mappings.get(water);
+            if light.is_none() {
+                continue;
+            }
+            let light = light.unwrap();
+
+            let temperature = self.light_to_temperature_mapping.mappings.get(light);
+            if temperature.is_none() {
+                continue;
+            }
+            let temperature = temperature.unwrap();
+
             let humidity = self
                 .temperature_to_humidity_mapping
                 .mappings
-                .get(temperature)
-                .unwrap();
-            let location = self
-                .humidity_to_location_mapping
-                .mappings
-                .get(humidity)
-                .unwrap();
+                .get(temperature);
+            if humidity.is_none() {
+                continue;
+            }
+            let humidity = humidity.unwrap();
+
+            let location = self.humidity_to_location_mapping.mappings.get(humidity);
+            if location.is_none() {
+                continue;
+            }
+            let location = location.unwrap();
 
             if location < &lowest_location {
                 lowest_location = *location;
