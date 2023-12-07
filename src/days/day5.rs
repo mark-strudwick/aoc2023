@@ -367,8 +367,89 @@ impl Solution for Day5 {
     }
 
     fn part2(&mut self) -> Vec<String> {
-        let mut total = 0;
+        let mut lowest_location: u32 = 0;
 
-        vec![total.to_string()]
+        let mut seed_ranges: Vec<RangeInclusive<u32>> = vec![];
+        for i in 0..self.seeds.len() {
+            if i % 2 == 0 {
+                let start = self.seeds[i];
+                let range = self.seeds[i + 1];
+
+                seed_ranges.push(RangeInclusive::new(start, start + range - 1))
+            }
+        }
+
+        for range in seed_ranges {
+            for seed in range {
+                let mut pointer = seed;
+                for mapping in &self.seed_to_soil_mapping.mappings {
+                    if mapping.source_range.contains(&seed) {
+                        let offset = seed - *mapping.source_range.start();
+                        let dest = mapping.dest_range.start() + offset;
+                        pointer = dest;
+                    }
+                }
+
+                for mapping in &self.soil_to_fertilizer_mapping.mappings {
+                    if mapping.source_range.contains(&pointer) {
+                        let offset = pointer - *mapping.source_range.start();
+                        let dest = mapping.dest_range.start() + offset;
+                        pointer = dest;
+                        break;
+                    }
+                }
+
+                for mapping in &self.fertilizer_to_water_mapping.mappings {
+                    if mapping.source_range.contains(&pointer) {
+                        let offset = pointer - *mapping.source_range.start();
+                        let dest = mapping.dest_range.start() + offset;
+                        pointer = dest;
+                        break;
+                    }
+                }
+
+                for mapping in &self.water_to_light_mapping.mappings {
+                    if mapping.source_range.contains(&pointer) {
+                        let offset = pointer - *mapping.source_range.start();
+                        let dest = mapping.dest_range.start() + offset;
+                        pointer = dest;
+                        break;
+                    }
+                }
+
+                for mapping in &self.light_to_temperature_mapping.mappings {
+                    if mapping.source_range.contains(&pointer) {
+                        let offset = pointer - *mapping.source_range.start();
+                        let dest = mapping.dest_range.start() + offset;
+                        pointer = dest;
+                        break;
+                    }
+                }
+
+                for mapping in &self.temperature_to_humidity_mapping.mappings {
+                    if mapping.source_range.contains(&pointer) {
+                        let offset = pointer - *mapping.source_range.start();
+                        let dest = mapping.dest_range.start() + offset;
+                        pointer = dest;
+                        break;
+                    }
+                }
+
+                for mapping in &self.humidity_to_location_mapping.mappings {
+                    if mapping.source_range.contains(&pointer) {
+                        let offset = pointer - *mapping.source_range.start();
+                        let dest = mapping.dest_range.start() + offset;
+                        pointer = dest;
+                        break;
+                    }
+                }
+
+                if pointer < lowest_location || lowest_location == 0 {
+                    lowest_location = pointer;
+                }
+            }
+        }
+
+        vec![lowest_location.to_string()]
     }
 }
